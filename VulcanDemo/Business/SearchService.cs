@@ -6,18 +6,21 @@ using EPiServer.Search.Queries;
 using EPiServer.Search.Queries.Lucene;
 using EPiServer.Security;
 using EPiServer;
+using System.Linq;
 
 namespace VulcanDemo.Business
 {
-    public class SearchService
+    public class SearchService : ISearchService
     {
-        private readonly SearchHandler _searchHandler;
-        private readonly IContentLoader _contentLoader;
+        SearchHandler _searchHandler;
+        IContentLoader _contentLoader;
+        ContentSearchHandler _contentSearchHandler;
 
-        public SearchService(SearchHandler searchHandler, IContentLoader contentLoader)
+        public SearchService(SearchHandler searchHandler, ContentSearchHandler contentSearchHandler, IContentLoader contentLoader)
         {
             _searchHandler = searchHandler;
             _contentLoader = contentLoader;
+            _contentSearchHandler = contentSearchHandler;
         }
 
         public virtual bool IsActive
@@ -25,10 +28,18 @@ namespace VulcanDemo.Business
             get { return SearchSettings.Config.Active; }
         }
 
-        public virtual SearchResults Search(string searchText, IEnumerable<ContentReference> searchRoots, HttpContextBase context, string languageBranch, int maxResults)
+        public virtual ISearchResults Search(string searchText, IEnumerable<ContentReference> searchRoots, HttpContextBase context, string languageBranch, int pageNumber, int maxResults)
         {
             var query = CreateQuery(searchText, searchRoots, context, languageBranch);
-            return _searchHandler.GetSearchResults(query, 1, maxResults);
+            var results =  _searchHandler.GetSearchResults(query, pageNumber, maxResults);
+            var contentList = results.IndexResponseItems.Select(LoadContent);
+
+            return new CustomSearchResults(contentList, results.TotalHits, results.Version);
+        }
+
+        private IContent LoadContent(IndexResponseItem responseItem)
+        {
+            return _contentSearchHandler.GetContent<IContent>(responseItem);
         }
 
         private IQueryExpression CreateQuery(string searchText, IEnumerable<ContentReference> searchRoots, HttpContextBase context, string languageBranch)

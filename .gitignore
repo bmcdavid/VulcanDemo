@@ -240,3 +240,6 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+**/App_Data/blobs/*
+**/App_Data/[Ii]ndex/*
