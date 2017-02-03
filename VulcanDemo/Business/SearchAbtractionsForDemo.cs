@@ -14,14 +14,14 @@ namespace VulcanDemo.Business
 
     public interface ISearchResults
     {
-        IEnumerable<IContent> Items { get; }
+        IEnumerable<IContent> Items { get; set; }
 
-        long TotalHits { get; }
+        long TotalHits { get; set; }
 
-        string Version { get; }
+        string Version { get; set; }
     }
-    
-    [ServiceConfiguration(typeof(ISearchResults))]
+        
+    [ServiceConfiguration(typeof(ISearchResults), Lifecycle = ServiceInstanceScope.Transient)]
     public class CustomSearchResults : ISearchResults
     {
         public CustomSearchResults(IEnumerable<IContent> items, long totalHits, string version)
@@ -31,10 +31,10 @@ namespace VulcanDemo.Business
             Version = version;
         }
 
-        public IEnumerable<IContent> Items { get; }
+        public IEnumerable<IContent> Items { get; set; }
 
-        public long TotalHits { get; }
+        public long TotalHits { get; set; }
 
-        public string Version { get; }
+        public string Version { get; set; }
     }
 }
