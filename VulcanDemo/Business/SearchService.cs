@@ -25,7 +25,7 @@ namespace VulcanDemo.Business
 
         public virtual bool IsActive
         {
-            get { return SearchSettings.Config.Active; }
+            get { return SearchSettings.Options.Active; }
         }
 
         public virtual ISearchResults Search(string searchText, IEnumerable<ContentReference> searchRoots, HttpContextBase context, string languageBranch, int pageNumber, int maxResults)
